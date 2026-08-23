@@ -1,0 +1,26 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Only authenticated users can access their own claim evidence folder
+    // Structure: claims/{userId}/{claimId}/evidence/{fileName}
+    match /claims/{userId}/{claimId}/evidence/{fileName} {
+      // Allow read only if the authenticated user's UID matches the userId in the path
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Allow write only if authenticated user's UID matches the path,
+      // file size is <= 10MB, and content type is valid image format
+      allow write: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.size <= 10 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*');
+
+      // Allow delete only if authenticated user's UID matches the path
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Disallow all other paths by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

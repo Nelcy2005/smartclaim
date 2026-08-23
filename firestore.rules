@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isReviewerOrAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role in ['admin', 'reviewer'] ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'reviewer'])
+      );
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId) || isReviewerOrAdmin();
+      allow delete: if false;
+    }
+    
+    // Orders collection: isolated per user or viewable by reviewer/admin
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isReviewerOrAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isReviewerOrAdmin());
+      allow update, delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isReviewerOrAdmin());
+    }
+
+    // Claims collection: users access own claims; reviewers/admins can view & update all
+    match /claims/{claimId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isReviewerOrAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isReviewerOrAdmin());
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isReviewerOrAdmin());
+      allow delete: if isReviewerOrAdmin();
+    }
+    
+    // Refunds collection: customers read own refunds; reviewers/admins can create, approve, and manage
+    match /refunds/{refundId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isReviewerOrAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isReviewerOrAdmin());
+      allow update: if isReviewerOrAdmin();
+      allow delete: if false;
+    }
+
+    // Analysis results: store AI inference audit trail
+    match /analysis_results/{analysisId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isReviewerOrAdmin());
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isReviewerOrAdmin());
+      allow delete: if false;
+    }
+
+    // Accountability Reviews collection
+    match /accountability_reviews/{reviewId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isReviewerOrAdmin();
+      allow delete: if false;
+    }
+
+    // Audit logs collection: immutable record of all claim transitions
+    match /audit_logs/{logId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // Notifications collection: strictly isolated per user
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+  }
+}

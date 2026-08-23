@@ -1,0 +1,119 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated user profile data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["customer", "admin"] },
+        "createdAt": { "type": "string" },
+        "lastLogin": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Perishable grocery orders placed by customer",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string" },
+        "userId": { "type": "string" },
+        "productName": { "type": "string" },
+        "productCategory": { "type": "string" },
+        "quantity": { "type": "number" },
+        "price": { "type": "number" },
+        "orderDate": { "type": "string" },
+        "orderTime": { "type": "string" },
+        "deliveryDate": { "type": "string" },
+        "deliveryTime": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["orderId", "userId", "productName", "price"]
+    },
+    "Claim": {
+      "title": "Claim",
+      "description": "Refund dispute claim submitted by customer",
+      "type": "object",
+      "properties": {
+        "claimId": { "type": "string" },
+        "userId": { "type": "string" },
+        "orderId": { "type": "string" },
+        "orderNumber": { "type": "string" },
+        "productName": { "type": "string" },
+        "productPrice": { "type": "number" },
+        "issueType": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string" },
+        "decision": { "type": "string" },
+        "evidenceStatus": { "type": "string" },
+        "decisionReason": { "type": "string" },
+        "recommendedRefundAmount": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["claimId", "userId", "orderId", "productName", "productPrice", "issueType"]
+    },
+    "RefundRecord": {
+      "title": "RefundRecord",
+      "description": "Refund processing record linked to a verified claim",
+      "type": "object",
+      "properties": {
+        "refundId": { "type": "string" },
+        "userId": { "type": "string" },
+        "claimId": { "type": "string" },
+        "orderId": { "type": "string" },
+        "productName": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string" },
+        "reason": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["refundId", "userId", "claimId", "amount", "status"]
+    },
+    "AiAnalysisResult": {
+      "title": "AiAnalysisResult",
+      "description": "Detailed AI model evaluation audit record",
+      "type": "object",
+      "properties": {
+        "analysisId": { "type": "string" },
+        "userId": { "type": "string" },
+        "claimId": { "type": "string" },
+        "prediction": { "type": "string" },
+        "confidence": { "type": "number" },
+        "condition": { "type": "string" },
+        "evidenceStatus": { "type": "string" },
+        "decision": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["analysisId", "userId", "prediction", "confidence"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile information"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "User grocery orders"
+    },
+    "/claims/{claimId}": {
+      "schema": "Claim",
+      "description": "Perishable claim disputes"
+    },
+    "/refunds/{refundId}": {
+      "schema": "RefundRecord",
+      "description": "Refund credit tracking records"
+    },
+    "/analysis_results/{analysisId}": {
+      "schema": "AiAnalysisResult",
+      "description": "AI analysis logs"
+    }
+  }
+}

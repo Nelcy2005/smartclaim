@@ -1,0 +1,31 @@
+{
+  "modelName": "MobileNetV2 Transfer Learning",
+  "modelVersion": "MobileNetV2-v1.2",
+  "dataset": "Fresh and Rotten Fruits Perishable Dataset (Kaggle/MDS471)",
+  "numClasses": 6,
+  "classes": [
+    "Fresh Apple",
+    "Fresh Banana",
+    "Fresh Orange",
+    "Rotten Apple",
+    "Rotten Banana",
+    "Rotten Orange"
+  ],
+  "metrics": {
+    "accuracy": 0.948,
+    "precision": 0.945,
+    "recall": 0.942,
+    "f1Score": 0.943,
+    "valLoss": 0.162,
+    "confidenceThreshold": 0.85
+  },
+  "trainingDetails": {
+    "baseModel": "MobileNetV2 (ImageNet weights)",
+    "inputShape": [224, 224, 3],
+    "trainableLayers": "Top Dense Classification Head + Block 14-16 Fine-tuning",
+    "optimizer": "Adam (lr=0.0001)",
+    "lossFunction": "Categorical Crossentropy",
+    "callbacks": ["EarlyStopping (patience=3)", "ModelCheckpoint", "ReduceLROnPlateau"]
+  },
+  "evaluatedAt": "2026-08-20T10:30:00Z"
+}

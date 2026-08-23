@@ -1,0 +1,6 @@
+{
+  "name": "SmartClaim AI",
+  "description": "AI-assisted product claim verification, resolution, and refund calculation platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
