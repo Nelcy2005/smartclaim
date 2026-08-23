@@ -137,6 +137,10 @@ async def predict_image_url(payload: PredictUrlRequest):
 
     return result
 
+@app.get("/")
+def read_root():
+    return {"message": "SmartClaim AI Backend is running. Visit /docs for the API documentation."}
+
 
 if __name__ == "__main__":
     import uvicorn
