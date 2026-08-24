@@ -1,106 +1,192 @@
-# SmartClaim AI — AI-Powered Instant Grocery Claim & Refund Verification Platform
+```markdown
+# SmartClaim - Automated Perishable Claim & Refund Verification Platform
 
-SmartClaim AI is an enterprise-grade, human-in-the-loop claim verification and refund automation system designed for instant grocery and quick-commerce platforms. It pairs real-time convolutional neural network (CNN) image classification with deterministic decision trees and role-based reviewer workflows to verify product damage or spoilage, safeguard business integrity, and accelerate fair customer refunds.
+SmartClaim AI is an automated claim verification and refund adjudication platform engineered for quick-commerce and instant grocery supply chains[cite: 1]. The system pairs a MobileNetV2 transfer learning Convolutional Neural Network (CNN) with deterministic decision logic and role-based review workflows to verify produce freshness, detect photographic evidence discrepancies, and automate fair customer resolutions[cite: 1].
 
----
-
-## 🌟 Key Features
-
-### 1. Customer Self-Service Claim Submission
-- **Guided 6-Step Workflow**: Order Selection → Product Selection → Defect Categorization → Permanent Photo Evidence Upload → Customer Notes → CNN Analysis.
-- **Permanent Evidence Storage**: Photo proofs are securely stored in Firebase Cloud Storage (`claims/{userId}/{claimId}/evidence/{fileName}`) with signed download URLs.
-- **Real-Time Notification Ledger**: In-app notifications alerting users whenever a claim is analyzed, moved to manual triage, approved, or settled.
-
-### 2. MobileNetV2 Transfer Learning Image Analysis
-- **Edge Inference Engine**: Leverages TensorFlow.js with a pretrained MobileNetV2 convolutional backbone fine-tuned for grocery quality diagnostics.
-- **6 Active Botanical Defect Classes**:
-  - `Fresh Apple`, `Fresh Banana`, `Fresh Orange` (Fresh Produce)
-  - `Rotten Apple`, `Rotten Banana`, `Rotten Orange` (Spoiled / Biological Decay)
-- **Laplacian Blur & Variance Validation**: Filters out low-quality, out-of-focus, or unreadable images prior to tensor feeding.
-- **Safety Confidence Threshold (85%)**: Predictions below 85.0% confidence automatically bypass automated recommendations and route directly to manual agent review.
-
-### 3. Claim Decision Engine & Safeguards
-- **Evidence Supported (Corroborated)**: AI decay classification matches customer's reported spoilage with high confidence → Automated 100% item refund recommendation.
-- **Evidence Conflict Detection**: Customer reports spoilage, but AI identifies fresh produce with high confidence → Flags conflict and routes to human reviewer without automated payout.
-- **Category Scope Enforcement**: Physical damage, broken packaging, or leaks outside produce freshness are routed to human review with explicit rationale.
-- **Human-in-the-Loop Safeguard Notice**: Clear, persistent disclaimer that *"AI analysis is an assistance tool and may not always be correct; humans retain final decision authority."*
-
-### 4. Admin & Reviewer Adjudication Console
-- **Manual Review Queue**: Multi-tab review console with filters for pending reviews, AI recommendations, approvals, and rejections.
-- **Adjudication Modal**: Deep-dive inspector displaying customer claims, permanent photo proof, AI model confidence breakdown, decision logs, and action controls:
-  - Approve Refund (triggers immediate simulated ledger credit).
-  - Reject Claim (with mandatory structured justification).
-  - Request Additional Evidence (with customer notification).
-- **Accountability & Root-Cause Analysis**: Identifies liability distribution (Transportation, Warehouse Hub, Vendor Shelf Expiry) without penalizing riders arbitrarily.
-- **Audit Trail & System Logs**: Immutable record of all automated evaluations and reviewer actions with timestamps, user IDs, and notes.
+Live Application: [SmartClaim AI on Render](https://smartclaim-frontend.onrender.com)
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## 1. Executive Summary (Project in 4 Sentences)
 
-- **Frontend**: React 18 (TypeScript), Tailwind CSS, Lucide Icons, Vite
-- **Backend & API Server**: Node.js + Express with Vite middleware
-- **Authentication**: Firebase Authentication (Google OAuth & Email Credentials)
-- **Database**: Firebase Firestore with strict Security Rules (RBAC / ABAC)
-- **Storage**: Firebase Storage for permanent customer evidence uploads
-- **Computer Vision**: TensorFlow.js MobileNetV2 Transfer Learning Model
+* **What We Used:** We integrated a MobileNetV2 transfer learning architecture with a FastAPI Python inference backend, a React/Vite web interface, and Firebase cloud services for authentication, storage, and database management[cite: 1].
+* **Why We Used It:** We selected this lightweight convolutional architecture to ensure high parameter efficiency, low inference latency, and seamless deployment within cloud hosting environments[cite: 1].
+* **What We Analyzed:** We analyzed customer-submitted photographic evidence against reported defect categories across six botanical produce freshness classes[cite: 1].
+* **What Output We Obtained:** We generated verified categorical predictions, confidence scores, evidence cross-checking statuses, automated refund recommendations, and supply-chain risk diagnostics[cite: 1].
 
 ---
 
-## 🔒 Security & Data Privacy (Firestore & Storage Rules)
+## 2. Problem Statement
 
-1. **Customer Data Scoping**: Customers can read and write **only** their own documents:
-   - `users/{userId}`: Scoped to `auth.uid == userId`.
-   - `orders/{orderId}`: Filtered by `auth.uid == resource.data.userId`.
-   - `claims/{claimId}`: Filtered by `auth.uid == resource.data.userId`.
-   - `refunds/{refundId}`: Filtered by `auth.uid == resource.data.userId`.
-2. **Reviewer & Admin Protection**:
-   - Only users with verified `reviewer` or `admin` roles in Firestore can access the adjudication console, approve refunds, or update claim status.
-3. **Role Tampering Prevention**:
-   - Customer clients cannot modify the `role` field on their user record.
+In quick-commerce delivery ecosystems, managing perishable claim disputes manually presents substantial challenges:
+1. **Operational Bottlenecks:** Human evaluation of incoming damage and spoilage claims is slow, leading to customer dissatisfaction.
+2. **Fraud Exposure:** Automated payout systems without visual verification are vulnerable to dishonest claims where undamaged produce is reported as defective.
+3. **Subjective Inconsistency:** Manual claim handlers lack uniform standards for assessing biological decay versus minor cosmetic blemishes.
+
+SmartClaim AI addresses these challenges by introducing an objective, computer-vision-assisted triage mechanism that validates customer claims while retaining human-in-the-loop oversight for ambiguous cases[cite: 1].
 
 ---
 
-## 🚀 Getting Started (Local Development)
+## 3. Technology Stack & Component Rationale
+
+| Layer | Technology | Primary Function & Rationale |
+| :--- | :--- | :--- |
+| **Deep Learning Base** | MobileNetV2 (ImageNet) | Pretrained convolutional feature extractor using depthwise separable convolutions to balance speed and accuracy[cite: 1]. |
+| **Classification Head** | Dense + Dropout + Softmax | Custom transfer learning head for 6-class produce freshness classification with regularized dropout layers[cite: 1]. |
+| **Backend API** | FastAPI (Python) | High-performance asynchronous API server handling image ingestion, preprocessing, tensor conversion, and inference[cite: 1]. |
+| **Frontend UI** | React 19 + Vite + TypeScript | Client-side dashboard with state management, modular components, and dynamic role-switching views[cite: 1]. |
+| **Authentication** | Firebase Auth | Secure Google OAuth session management and user identification[cite: 1]. |
+| **Database** | Cloud Firestore | Real-time NoSQL storage for claims, test orders, audit logs, and refund transactions[cite: 1]. |
+| **Object Storage** | Firebase Storage | Permanent storage for uploaded photographic evidence with secure path isolation[cite: 1]. |
+
+---
+
+## 4. Model Architecture & Evaluation Metrics
+
+The classification engine is trained and evaluated on a benchmark produce freshness dataset covering six discrete classes[cite: 1]:
+1. Fresh Apple[cite: 1]
+2. Fresh Banana[cite: 1]
+3. Fresh Orange[cite: 1]
+4. Rotten Apple[cite: 1]
+5. Rotten Banana[cite: 1]
+6. Rotten Orange[cite: 1]
+
+### Test Performance Metrics (MDS471 Benchmark)
+
+* **Overall Test Accuracy:** 94.8%[cite: 1]
+* **Macro Precision:** 94.5%[cite: 1]
+* **Macro Recall:** 94.2%[cite: 1]
+* **Macro F1-Score:** 94.3%[cite: 1]
+* **Validation Loss:** 0.162[cite: 1]
+* **Safety Confidence Threshold:** 85.0%[cite: 1]
+
+### Safety & Guardrail Mechanisms
+
+* **Laplacian Blur Check:** Measures discrete Laplacian operator variance; images scoring below a 14.0 threshold are flagged as blurry and routed to manual triage rather than forcing an uncertain inference[cite: 1].
+* **Confidence Gating:** Predictions with confidence under 85.0% are treated as inconclusive and transferred to a human reviewer[cite: 1].
+* **Conflict Detection Logic:** When a user reports spoilage but the model detects fresh produce with high confidence, automated payouts are withheld, preventing fraudulent settlements[cite: 1].
+* **Domain Scope Limitation:** Non-freshness issues (e.g., package tearing, leakage, crushing) automatically bypass the produce CNN model and queue directly for manual agent evaluation[cite: 1].
+
+---
+
+## 5. End-to-End Workflow & Output Results
+
+1. **Order & Defect Selection:** The user selects a delivered grocery item and specifies the defect type (e.g., Spoiled, Damaged, Expired)[cite: 1].
+2. **Evidence Ingestion:** The user uploads photographic proof, which is validated, scaled, and uploaded to Firebase Storage[cite: 1].
+3. **CNN Preprocessing & Inference:** The image is resized to (224, 224, 3) and normalized to [-1.0, 1.0] before being evaluated by the MobileNetV2 network[cite: 1].
+4. **Decision Synthesis:**
+   * **Evidence Supported:** Spoilage is confirmed with >= 85% confidence. The system issues a "Refund Recommended" status and queues a price-matched refund record[cite: 1].
+   * **Conflict Detected / Inconclusive:** Spoilage is not corroborated or confidence is low. The system assigns a "Manual Review Required" status[cite: 1].
+5. **Operational Risk Attribution:** The engine estimates diagnostic risk indicators across Transportation, Storage/Hub, and Shelf Expiry to assist supply chain managers in root-cause tracking[cite: 1].
+
+---
+
+## 6. Local Setup and Installation Guide
+
+Follow these steps to run the complete solution locally on your system.
 
 ### Prerequisites
-- Node.js 18+ or 20+
-- npm or yarn
+* Node.js (v18.0 or higher)
+* Python (v3.10 or higher)
+* Git
 
-### Installation
+---
+
+### Step 1: Clone the Repository
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/smartclaim-ai.git
-cd smartclaim-ai
+git clone [https://github.com/Nelcy2005/smartclaim.git](https://github.com/Nelcy2005/smartclaim.git)
+cd smartclaim
 
-# Install dependencies
+```
+
+---
+
+### Step 2: Backend Setup (FastAPI)
+
+```bash
+# Navigate to the backend directory
+cd backend
+
+# Create and activate a Python virtual environment
+# On Windows:
+python -m venv venv
+venv\Scripts\activate
+
+# On macOS/Linux:
+python3 -m venv venv
+source venv/bin/activate
+
+# Install required dependencies
+pip install -r requirements.txt
+
+# Start the FastAPI server
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+```
+
+The backend service will be available at `http://localhost:8000`. You can verify its health status at `http://localhost:8000/health`.
+
+---
+
+### Step 3: Frontend Setup (React & Vite)
+
+```bash
+# Open a new terminal and return to project root
+cd ..
+
+# Install Node dependencies
 npm install
 
-# Run development server
+# Create a .env file in the root directory and add your Firebase credentials:
+# VITE_FIREBASE_API_KEY=your_api_key
+# VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+# VITE_FIREBASE_PROJECT_ID=your_project_id
+# VITE_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
+# VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+# VITE_FIREBASE_APP_ID=your_app_id
+# VITE_FIREBASE_DATABASE_ID=your_database_id
+# VITE_AI_BACKEND_URL=http://localhost:8000
+
+# Start the Vite development server
 npm run dev
-```
-The application will launch on `http://localhost:3000`.
 
-### Production Build
-```bash
-# Compile client assets and backend bundle
-npm run build
-
-# Start production server
-npm start
 ```
+
+The frontend interface will open at `http://localhost:3000` or `http://localhost:5173`.
 
 ---
 
-## 🌐 Deployment to Render
+## 7. Cloud Deployment Configuration (Render)
 
-1. **Service Type**: Web Service
-2. **Environment**: Node
-3. **Build Command**: `npm run build`
-4. **Start Command**: `npm start`
-5. **Port**: Bind to port `3000` (or `PORT` environment variable).
+### Python Backend (Web Service)
+
+* **Environment:** Python 3
+
+
+* **Root Directory:** `backend`
+
+* **Build Command:** `pip install -r requirements.txt`
+
+* **Start Command:** `uvicorn main:app --host 0.0.0.0 --port $PORT`
+
+
+### React Frontend (Static Site)
+
+* **Build Command:** `npm run build`
+
+* **Publish Directory:** `dist`
+
+* **Redirects/Rewrites:** Add a Rewrite rule routing `/*` to `/index.html`
 
 ---
 
-## 📄 License & Attribution
-Developed for the **MDS471 Capstone Benchmark** — AI in Supply Chain & Quick-Commerce Quality Assurance.
+## 8. Future Scope
+
+* **Taxonomy Expansion:** Broaden the training dataset to include vegetables, dairy products, bakery items, and meats.
+* **EXIF Metadata Auditing:** Analyze image capture metadata (timestamp, geolocation, camera parameters) to prevent reuse of external stock photos.
+* **Multi-Modal Damage Detection:** Train complementary object detection models (e.g., YOLO) to identify physical container punctures, liquid spills, and box crushing.
+* **ERP & Payment Gateway Integration:** Establish live webhooks with enterprise supply chain software and automated payment settlement gateways for instant real-time bank reversals.
+
+```
+
+```
